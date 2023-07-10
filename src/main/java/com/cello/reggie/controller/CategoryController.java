@@ -8,12 +8,10 @@ import com.cello.reggie.entity.Employee;
 import com.cello.reggie.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -22,23 +20,55 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    /**
+     * 添加分类
+     * @param category
+     * @return
+     */
+    @PostMapping
+    public R<String> save(@RequestBody Category category){
+        log.info("category:{}",category);
+        categoryService.save(category);
+        return R.success("新增分类成功");
+    }
+
+
     @GetMapping("/page")
     public R<Page> page(int page, int pageSize){
-        log.info("page = {}, pageSize = {}",page);
+        //log.info("page = {}, pageSize = {}",page);
 
         //构造分页构造器
-        Page pageInfo = new Page(page,pageSize);
+        Page<Category> pageInfo = new Page<>(page,pageSize);
 
         //构造条件构造器
-        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper();
-        //添加过滤条件
-        //queryWrapper.like(StringUtils.isNotEmpty(name),Employee::getName,name);
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
 
         //添加排序条件
-        queryWrapper.orderByDesc(Employee::getUpdateTime);
+        queryWrapper.orderByAsc(Category::getSort);
         //执行查询
-        //categoryService.page(pageInfo,queryWrapper);
+        categoryService.page(pageInfo,queryWrapper);
 
         return R.success(pageInfo);
     }
+
+    @DeleteMapping
+    public R<String> delete(Long id){
+        log.info("将要删除的分类id:{}",id);
+        categoryService.remove(id);
+        return R.success("分类信息删除成功");
+    }
+
+    @PutMapping
+    public  R<String> update(@RequestBody Category category){
+
+        LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Category::getId,category.getId());
+        categoryService.update(category,wrapper);
+
+        //categoryService.updateById(category);
+
+        return R.success("分类信息修改成功");
+    }
+
+
 }
