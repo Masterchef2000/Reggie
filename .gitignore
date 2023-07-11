@@ -6,3 +6,11 @@ target/
 .idea/
 #忽略所有.iml文件
 *.iml
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
