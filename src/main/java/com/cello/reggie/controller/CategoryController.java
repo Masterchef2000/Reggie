@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/category")
@@ -70,5 +72,18 @@ public class CategoryController {
         return R.success("分类信息修改成功");
     }
 
-
+    /**
+     * 在新增菜品时，列出菜品分类以供选择
+     * @param category
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Category>> list(Category category){
+        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(category.getType() != null,Category::getType,category.getType());
+        lambdaQueryWrapper.orderByDesc(Category::getSort);
+        //查询数据
+        List<Category> res = categoryService.list(lambdaQueryWrapper);
+        return R.success(res);
+    }
 }
