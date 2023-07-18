@@ -42,7 +42,7 @@ public class CommonController {
         //上传图片
         try {
             file.transferTo(new File(storagePath + filename));
-            log.info("文件存储路径为"+ storagePath + filename);
+            //log.info("文件存储路径为"+ storagePath + filename);
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -59,32 +59,36 @@ public class CommonController {
      */
     @GetMapping("/download")
     public void download(String name, HttpServletResponse response){
-        try{
-            //输入流
+
+        try {
+            //输入流，通过输入流读取文件内容
             FileInputStream fileInputStream = new FileInputStream(new File(storagePath + name));
-            //输出流
-            ServletOutputStream OutputStream = response.getOutputStream();
+
+            //输出流，通过输出流将文件写回浏览器，在浏览器展示图片
+            ServletOutputStream outputStream = response.getOutputStream();
+
             //代表图片文件
             response.setContentType("image/jpeg");
 
             int len = 0;
             byte[] bytes = new byte[1024];
-            while((len = fileInputStream.read(bytes)) != 0){
-                //向response缓冲区中写入bytes，再由tomcat服务器将字节内容组成Http相应返回服务器
-                OutputStream.write(bytes,0,len);
-                OutputStream.flush();
+            while ((len = fileInputStream.read(bytes)) != -1){
+                //向response缓冲区中写入字节，再由Tomcat服务器将字节内容组成Http响应返回给浏览器。
+                outputStream.write(bytes,0,len);
+                //所储存的数据全部清空
+                outputStream.flush();
             }
 
             //关闭流
             fileInputStream.close();
-            OutputStream.close();
+            outputStream.close();
 
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
+
+
 
 
 }

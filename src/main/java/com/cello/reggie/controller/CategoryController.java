@@ -74,7 +74,7 @@ public class CategoryController {
 
     /**
      * 在新增菜品时，列出菜品分类以供选择
-     * @param category
+     * @param category 使用实体类来封装传递的参数type = 1，这样比参数为String type泛用性更好一些
      * @return
      */
     @GetMapping("/list")
